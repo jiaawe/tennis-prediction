@@ -277,11 +277,17 @@ class TennisDataset(Dataset):
                         frame_key_n = f"frame_{(frame + offset + n):06d}" # add offset
                         
                         if frame_key not in pose_data:
+                            print(f"Warning: {frame_key} not found in pose data for {rally['video_id']}, skipping event")
+                            continue
+                        
+                        if frame_key not in bbox_data:
+                            print(f"Warning: {frame_key} not found in bbox data for {rally['video_id']}, skipping event")
                             continue
                         
                         if frame_key_n not in pose_data:
                             print(f"Frame {frame_key_n} not found in pose data")
                             continue
+                        
                             
                         # Get poses, confidences, and bboxes
                         poses, confidences, _ = self._get_poses_with_bbox(pose_data[frame_key], self.max_poses)

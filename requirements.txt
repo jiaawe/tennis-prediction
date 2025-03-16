@@ -1,0 +1,5 @@
+ultralytics
+opencv-python>=4.5.0
+Pillow>=8.0.0
+matplotlib>=3.4.0
+seaborn>=0.11.0

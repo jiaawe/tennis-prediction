@@ -42,3 +42,4 @@ models/
 *.mp4
 " > .gitignore
 Open-GroundingDino/
+experiments/

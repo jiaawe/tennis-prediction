@@ -78,13 +78,9 @@ tennis-prediction/
 
 3. Download pre-trained models:
    ```bash
-   # For GroundingDINO
-   mkdir -p Open-GroundingDINO/logs
-   wget -O Open-GroundingDINO/logs/checkpoint0014.pth https://github.com/IDEA-Research/GroundingDINO/releases/download/v0.1.0-alpha/groundingdino_swint_ogc.pth
-   
    # For YOLO-Pose
    mkdir -p models
-   wget -O models/yolo11x-pose.pt https://github.com/ultralytics/assets/releases/download/v8.1.0/yolov11x-pose.pt
+   wget -O models/yolo11x-pose.pt https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11x-pose.pt
    ```
 
 4. Install other requirements:

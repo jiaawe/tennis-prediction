@@ -230,14 +230,15 @@ class TennisDataset(Dataset):
             if self.video_ids and video_id not in self.video_ids:
                 continue
             
+            # Determine which videos has offset
             offset_videos = ["Granollers_Zeballos vs Arevalo_Rojer  _ Toronto 2023 Doubles Semi-Finals", 
-                             "Nick Kyrgios_Thanasi Kokkinakis vs Jack Sock_John Isner _ Indian Wells 2022 Doubles Highlights",
-                             "Rajeev Ram_Joe Salisbury vs Tim Puetz_Michael Venus _ Cincinnati 2022 Doubles Final",
-                             "Salisbury_Ram vs Krawietz_Puetz  _ Toronto 2023 Doubles Semi-Finals",
+                            "Nick Kyrgios_Thanasi Kokkinakis vs Jack Sock_John Isner _ Indian Wells 2022 Doubles Highlights",
+                            "Rajeev Ram_Joe Salisbury vs Tim Puetz_Michael Venus _ Cincinnati 2022 Doubles Final",
+                            "Salisbury_Ram vs Krawietz_Puetz  _ Toronto 2023 Doubles Semi-Finals",
                             #  "VUPKfQgXy8g",
                             #  "EMBw_kXc574",
                             #  "eGFJAG-2jM8"
-                             ]
+                            ]
             
             if any(video in video_id for video in offset_videos):
                 offset = 30 # 30 frames before the event (which is specified during processing)
@@ -287,7 +288,6 @@ class TennisDataset(Dataset):
                         if frame_key_n not in pose_data:
                             print(f"Frame {frame_key_n} not found in pose data")
                             continue
-                        
                             
                         # Get poses, confidences, and bboxes
                         poses, confidences, _ = self._get_poses_with_bbox(pose_data[frame_key], self.max_poses)
@@ -305,6 +305,15 @@ class TennisDataset(Dataset):
                         # hitting_player = self._get_hitting_player_label(bboxes, player_position)
                         hitting_player, hitting_partner = self._get_hitting_players(bboxes, player_position)
                         hitting_player_n = self._get_hitting_player_label(bboxes_n, player_position)
+                        
+                        # Check if indices are within bounds of poses array
+                        if hitting_player >= self.max_poses or hitting_partner >= self.max_poses:
+                            print(f'hitting player or partner index out of bounds in {frame_key}')
+                            continue
+                        
+                        if hitting_player_n >= self.max_poses:
+                            print(f'hitting player n index out of bounds in {frame_key_n}')
+                            continue
                         
                         if hitting_partner == -1 or hitting_player == -1:
                             print(f'no hitting player or partner found in {frame_key}')
@@ -388,7 +397,8 @@ class TennisDataset(Dataset):
 
                         else:
                             raise(ValueError('Incorrect Train Label'))
-                        we
+                        
+                        # FIX: Removed 'we' typo that was here
                         self.serve_types.add(serve_type)
                         self.samples.append({
                             'poses': poses,

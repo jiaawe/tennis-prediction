@@ -148,19 +148,6 @@ This script:
 - Saves pose data to `data/pose/{video_id}_pose.json`
 - Creates processed videos with pose overlays in `data/processed_videos/`
 
-### 5. Extract Hitting Players
-
-Identify which player is hitting the ball in each event:
-
-```bash
-python processing/extract_hitting_player.py
-```
-
-This script:
-- Uses event metadata to identify the player hitting the ball
-- Creates cropped images of hitting players and partners
-- Saves images to `data/hitting_player/` and `data/hitting_partner/`
-
 ## Model Architectures
 
 The project implements multiple model architectures to analyze different aspects of tennis gameplay:

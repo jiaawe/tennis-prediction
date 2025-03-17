@@ -388,7 +388,7 @@ class TennisDataset(Dataset):
 
                         else:
                             raise(ValueError('Incorrect Train Label'))
-                        
+                        we
                         self.serve_types.add(serve_type)
                         self.samples.append({
                             'poses': poses,
@@ -397,7 +397,7 @@ class TennisDataset(Dataset):
                             'player_position': player_position,
                             'hitting_player': hitting_player,
                             'hitting_partner': hitting_partner,
-                            # 'hitting_player_pose': poses[hitting_player],
+                            'hitting_player_pose': poses[hitting_player],
                             'hitting_player_bbox': bboxes[hitting_player],
                             'hitting_partner_bbox': bboxes[hitting_partner],
                             'video_id': video_id,
@@ -468,18 +468,18 @@ class TennisDataset(Dataset):
         ], axis=-1)
         
         return {
-            # 'poses': torch.tensor(poses_with_conf, dtype=torch.float32),
-            # 'bboxes': torch.tensor(normalized_bboxes, dtype=torch.float32),
-            # 'player_position': torch.tensor(sample['player_position'], dtype=torch.float32),
+            'poses': torch.tensor(poses_with_conf, dtype=torch.float32),
+            'bboxes': torch.tensor(normalized_bboxes, dtype=torch.float32),
+            'player_position': torch.tensor(sample['player_position'], dtype=torch.float32),
             'hitting_player': torch.tensor(sample['hitting_player'], dtype=torch.long),
             'hitting_partner': torch.tensor(sample['hitting_partner'], dtype=torch.long),
             'hitting_player_n': torch.tensor(sample['hitting_player_n'], dtype=torch.long),
             'serve_type': torch.tensor(self.label_map[sample['serve_type']], dtype=torch.long),
-            # 'side': sample['side'],
+            'side': sample['side'],
             'image_path': sample['image_path'],
             'image_path_partner': sample['image_path_partner'],
             'image_path_n': sample['image_path_n'],
-            # 'hitting_player_pose': torch.tensor(sample['hitting_player_pose'], dtype=torch.float32)
+            'hitting_player_pose': torch.tensor(sample['hitting_player_pose'], dtype=torch.float32)
         }
     
     def __len__(self):

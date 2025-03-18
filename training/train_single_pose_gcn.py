@@ -279,8 +279,8 @@ if __name__ == '__main__':
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f"Using device: {device}")
     
-    # Define train and test video IDs
-    train_videos = [
+    # Define videos list and split into train, validation, and test sets
+    all_train_videos = [
         'an7MXASRyI0',
         'eGFJAG-2jM8',
         'EMBw_kXc574',
@@ -288,6 +288,10 @@ if __name__ == '__main__':
         'Nick Kyrgios_Thanasi Kokkinakis vs Jack Sock_John Isner _ Indian Wells 2022 Doubles Highlights',
         'Rajeev Ram_Joe Salisbury vs Tim Puetz_Michael Venus _ Cincinnati 2022 Doubles Final'
     ]
+    
+    # Split all_train_videos into train and validation
+    train_videos = all_train_videos[:-2]  # Use first 4 videos for training
+    val_videos = all_train_videos[-2:]    # Use last 2 videos for validation
     
     test_videos = [
         'Salisbury_Ram vs Krawietz_Puetz  _ Toronto 2023 Doubles Semi-Finals',
@@ -315,6 +319,14 @@ if __name__ == '__main__':
         train_label=label
     )
     
+    # Create validation dataset
+    val_dataset = TennisDataset(
+        data_dir='data',
+        video_ids=val_videos,
+        max_poses=MAX_POSES,
+        train_label=label
+    )
+    
     test_dataset = TennisDataset(
         data_dir='data',
         video_ids=test_videos,
@@ -330,6 +342,14 @@ if __name__ == '__main__':
         collate_fn=custom_collate_fn
     )
     
+    # Create validation loader
+    val_loader = DataLoader(
+        val_dataset,
+        batch_size=BATCH_SIZE,
+        shuffle=False,
+        collate_fn=custom_collate_fn
+    )
+    
     test_loader = DataLoader(
         test_dataset,
         batch_size=BATCH_SIZE,
@@ -338,6 +358,7 @@ if __name__ == '__main__':
     )
     
     print(f"Train dataset size: {len(train_dataset)}")
+    print(f"Validation dataset size: {len(val_dataset)}")
     print(f"Test dataset size: {len(test_dataset)}")
     
     # Get number of classes from the dataset's label_map
@@ -385,33 +406,32 @@ if __name__ == '__main__':
         train_loss, train_acc = train_epoch(
             model, train_loader, criterion, optimizer, device)
         
-        # Validation
-        if (epoch + 1) % 5 == 0:
-            val_loss, val_acc, _ = evaluate(
-                model, test_loader, criterion, device)
+        # Validation (now using val_loader instead of test_loader) 
+        val_loss, val_acc, _ = evaluate(
+            model, val_loader, criterion, device)
+    
+        # Update history
+        history['train_loss'].append(train_loss)
+        history['train_acc'].append(train_acc)
+        history['val_loss'].append(val_loss)
+        history['val_acc'].append(val_acc)
         
-            # Update history
-            history['train_loss'].append(train_loss)
-            history['train_acc'].append(train_acc)
-            history['val_loss'].append(val_loss)
-            history['val_acc'].append(val_acc)
-            
-            # Print epoch statistics
-            print(f'\nEpoch [{epoch+1}/{NUM_EPOCHS}]:')
-            print(f'  Training Loss: {train_loss:.4f}')
-            print(f'  Training Accuracy: {train_acc:.2f}%')
-            print(f'  Validation Loss: {val_loss:.4f}')
-            print(f'  Validation Accuracy: {val_acc:.2f}%')
-            
-            # Save best model
-            if val_acc > best_val_acc:
-                best_val_acc = val_acc
-                torch.save({
-                    'epoch': epoch,
-                    'model_state_dict': model.state_dict(),
-                    'optimizer_state_dict': optimizer.state_dict(),
-                    'val_acc': best_val_acc,
-                }, os.path.join(save_dir, 'best_model.pth'))
+        # Print epoch statistics
+        print(f'\nEpoch [{epoch+1}/{NUM_EPOCHS}]:')
+        print(f'  Training Loss: {train_loss:.4f}')
+        print(f'  Training Accuracy: {train_acc:.2f}%')
+        print(f'  Validation Loss: {val_loss:.4f}')
+        print(f'  Validation Accuracy: {val_acc:.2f}%')
+        
+        # Save best model
+        if val_acc > best_val_acc:
+            best_val_acc = val_acc
+            torch.save({
+                'epoch': epoch,
+                'model_state_dict': model.state_dict(),
+                'optimizer_state_dict': optimizer.state_dict(),
+                'val_acc': best_val_acc,
+            }, os.path.join(save_dir, 'best_model.pth'))
     
     # Save training history and plots
     with open(os.path.join(save_dir, 'training_history.json'), 'w') as f:
@@ -445,7 +465,7 @@ if __name__ == '__main__':
     checkpoint = torch.load(os.path.join(save_dir, 'best_model.pth'))
     model.load_state_dict(checkpoint['model_state_dict'])
     
-    # Evaluate with detailed metrics
+    # Evaluate with detailed metrics on the test set
     print("Computing final evaluation metrics...")
     _, final_acc, metrics = evaluate(
         model, 

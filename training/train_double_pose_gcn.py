@@ -362,10 +362,10 @@ if __name__ == '__main__':
     MAX_POSES = 4
     HIDDEN_DIM = 64
     FEATURE_DIM = 128
-    label = 'shot_direction'  # Options: 'shot_direction', 'serve_direction', 'formation', 'outcome'
+    label = 'outcome_all'  # Options: 'shot_direction', 'serve_direction', 'formation', 'outcome'
     
     # Determine the second pose type based on the label
-    if label in ['outcome', 'shot_direction']:
+    if label in ['outcome', 'shot_direction', 'shot_direction_all']:
         second_type = 'future'
         print(f"Using future frame pose for {label} prediction")
     else:

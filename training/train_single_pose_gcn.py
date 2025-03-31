@@ -303,7 +303,7 @@ if __name__ == '__main__':
     NUM_EPOCHS = 50
     LEARNING_RATE = 0.001
     MAX_POSES = 4  # Keep this for the original dataset
-    label = 'shot_type'  # Can be changed to any of the available labels
+    label = 'shot_direction_all'  # Can be changed to any of the available labels
     
     # Create save directory with timestamp
     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')

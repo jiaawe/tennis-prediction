@@ -223,6 +223,7 @@ class TennisDataset(Dataset):
         transform_dir = os.path.join(self.data_dir, 'transformed')
         
         for file in os.listdir(transform_dir):
+            num_events = 0
             if not file.endswith('.json'):
                 continue
                 
@@ -273,6 +274,7 @@ class TennisDataset(Dataset):
                         bbox_data = json.load(f)
                         
                     for event in rally['events']:
+                        num_events += 1
                         frame = event['frame']
                         frame_key = f"frame_{(frame + offset):06d}" # add offset
                         frame_key_n = f"frame_{(frame + offset + n):06d}" # add offset
@@ -375,6 +377,9 @@ class TennisDataset(Dataset):
                             else:
                                 serve_type = 'cross'
                         
+                        elif train_label == 'shot_direction_all':
+                            serve_type = serve_parts[5]
+                        
                         elif train_label == 'serve_direction':
                             serve_type = serve_parts[5]
                             if serve_type != 't' and serve_type != 'w' and serve_type != 'b':
@@ -390,6 +395,9 @@ class TennisDataset(Dataset):
                             serve_type = serve_parts[7]
                             if serve_type == 'in': continue
                             
+                        elif train_label == 'outcome_all':
+                            serve_type = serve_parts[7]
+                            
                         elif train_label == 'is_serve':
                             serve_type = serve_parts[4]
                             if serve_type == 'second-serve': serve_type = 'serve'
@@ -398,7 +406,6 @@ class TennisDataset(Dataset):
                         else:
                             raise(ValueError('Incorrect Train Label'))
                         
-                        # FIX: Removed 'we' typo that was here
                         self.serve_types.add(serve_type)
                         self.samples.append({
                             'poses': poses,
@@ -420,6 +427,8 @@ class TennisDataset(Dataset):
                             'hitting_player_n_bbox': hitting_player_n_bbox,
                             'hitting_player_n': hitting_player_n
                         })
+                        
+            print(f"Number of events in {file}: {num_events}")
                         
     def _get_class_distribution(self):
         # Initialize a dictionary to store class counts
